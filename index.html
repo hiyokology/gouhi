@@ -250,11 +250,8 @@
             const sci = parseFloat(document.getElementById('science').value) || 0;
             const eng = parseFloat(document.getElementById('english').value) || 0;
 
-            // A学科：単純合計 (ボーダー 500)
+            // 得点計算
             const totalA = jpn + mat + sci + eng;
-
-            // B学科：傾斜配点 (ボーダー 600)
-            // 英語 1.33倍 / 数学・理科 1.25倍 / 国語 1倍
             const totalB = jpn + (mat * 1.25) + (sci * 1.25) + (eng * 1.33);
 
             // 表示処理
@@ -293,6 +290,14 @@
 
             updateUI('judgeA', 'scoreA', totalA, 500);
             updateUI('judgeB', 'scoreB', totalB, 600);
+            updateUI('judgeC', 'scoreC', totalC, 500);
+            updateUI('judgeD', 'scoreD', totalD, 600);
+            updateUI('judgeE', 'scoreE', totalE, 600);
+            updateUI('judgeF', 'scoreF', totalF, 600);
+            updateUI('judgeG', 'scoreG', totalG, 600);
+            updateUI('judgeP1', 'scoreP1', totalP1, 600);
+            updateUI('judgeQ1', 'scoreQ1', totalQ1, 600);
+            updateUI('judgeQ2', 'scoreQ2', totalQ2, 600);
         });
     </script>
 </body>
