@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合否判定システム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kiwi+Maru&display=swap');
+        body {
+            font-family: 'Kiwi Maru', serif;
+            background-color: #fdf2f8;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(244, 114, 182, 0.15);
+            border: 1px solid rgba(244, 114, 182, 0.2);
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div class="glass-card w-full max-w-lg p-10">
+        <h1 class="text-3xl font-bold text-pink-600 text-center mb-8">🌸 志望学科 合否判定 🌸</h1>
+        
+        <form id="judgeForm" class="space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-pink-700 mb-1.5">国語</label>
+                    <input type="number" id="japanese" required min="0" placeholder="0"
+                        class="w-full px-4 py-3 border border-pink-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 text-gray-700 bg-pink-50/30">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-pink-700 mb-1.5">数学</label>
+                    <input type="number" id="math" required min="0" placeholder="0"
+                        class="w-full px-4 py-3 border border-pink-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 text-gray-700 bg-pink-50/30">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-pink-700 mb-1.5">理科</label>
+                    <input type="number" id="science" required min="0" placeholder="0"
+                        class="w-full px-4 py-3 border border-pink-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 text-gray-700 bg-pink-50/30">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-pink-700 mb-1.5">英語</label>
+                    <input type="number" id="english" required min="0" placeholder="0"
+                        class="w-full px-4 py-3 border border-pink-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 text-gray-700 bg-pink-50/30">
+                </div>
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 rounded-2xl transition-all duration-300 shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 mt-4">
+                結果を判定する
+            </button>
+        </form>
+
+        <!-- 結果表示エリア -->
+        <div id="resultArea" class="mt-10 hidden space-y-6">
+            <div class="space-y-4">
+                <!-- A学科 (500点・単純合計) -->
+                <div class="p-5 rounded-2xl bg-white border border-pink-50 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-pink-200"></div>
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-lg">A学科</h3>
+                            <p class="text-xs text-gray-500 italic">計算方式：全科目単純合計 (ボーダー 500点)</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-gray-400">Score:</span>
+                            <p id="scoreA" class="font-bold text-gray-700"></p>
+                        </div>
+                    </div>
+                    <div id="judgeA" class="mt-2"></div>
+                </div>
+
+                <!-- B学科 (600点・傾斜配点) -->
+                <div class="p-5 rounded-2xl bg-white border border-pink-50 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-purple-200"></div>
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-lg">B学科</h3>
+                            <p class="text-xs text-gray-500 italic">計算方式：傾斜配点 (ボーダー 600点)</p>
+                            <p class="text-[10px] text-gray-400">英x1.33 / 数理x1.25</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-gray-400">Weighted Score:</span>
+                            <p id="scoreB" class="font-bold text-gray-700"></p>
+                        </div>
+                    </div>
+                    <div id="judgeB" class="mt-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('judgeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // 値の取得
+            const jpn = parseFloat(document.getElementById('japanese').value) || 0;
+            const mat = parseFloat(document.getElementById('math').value) || 0;
+            const sci = parseFloat(document.getElementById('science').value) || 0;
+            const eng = parseFloat(document.getElementById('english').value) || 0;
+
+            // A学科：単純合計 (ボーダー 500)
+            const totalA = jpn + mat + sci + eng;
+
+            // B学科：傾斜配点 (ボーダー 600)
+            // 英語 1.33倍 / 数学・理科 1.25倍 / 国語 1倍
+            const totalB = jpn + (mat * 1.25) + (sci * 1.25) + (eng * 1.33);
+
+            // 表示処理
+            const resultArea = document.getElementById('resultArea');
+            resultArea.classList.remove('hidden');
+
+            // 判定ロジック
+            function updateUI(elementId, scoreId, score, border) {
+                const target = document.getElementById(elementId);
+                const scoreTarget = document.getElementById(scoreId);
+                
+                // スコア表示 (小数点2位まで)
+                const displayScore = Math.round(score * 100) / 100;
+                scoreTarget.innerText = displayScore + " pt";
+
+                const diff = Math.abs(displayScore - border).toFixed(2);
+                
+                if (displayScore >= border) {
+                    target.innerHTML = `
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl">🌸</span>
+                            <span class="text-xl font-bold text-pink-600">合格</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">ボーダーラインを ${diff} 点上回っています！</p>
+                    `;
+                } else {
+                    target.innerHTML = `
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl">❄️</span>
+                            <span class="text-xl font-bold text-blue-500">不合格</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">あと ${diff} 点で合格ラインです。</p>
+                    `;
+                }
+            }
+
+            updateUI('judgeA', 'scoreA', totalA, 500);
+            updateUI('judgeB', 'scoreB', totalB, 600);
+        });
+    </script>
+</body>
+</html>
