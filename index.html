@@ -245,10 +245,16 @@
             e.preventDefault();
 
             // 値の取得
-            const jpn = parseFloat(document.getElementById('japanese').value) || 0;
-            const mat = parseFloat(document.getElementById('math').value) || 0;
-            const sci = parseFloat(document.getElementById('science').value) || 0;
-            const eng = parseFloat(document.getElementById('english').value) || 0;
+            const ko1 = parseFloat(document.getElementById('k01').value) || 0;
+            const sy1 = parseFloat(document.getElementById('sy1').value) || 0;
+            const su1 = parseFloat(document.getElementById('su1').value) || 0;
+            const ri1 = parseFloat(document.getElementById('ri1').value) || 0;
+            const ei1 = parseFloat(document.getElementById('ei1').value) || 0;
+            const jo1 = parseFloat(document.getElementById('jo1').value) || 0;
+            const jpn = parseFloat(document.getElementById('ko2').value) || 0;
+            const mat = parseFloat(document.getElementById('su2').value) || 0;
+            const sci = parseFloat(document.getElementById('ri2').value) || 0;
+            const eng = parseFloat(document.getElementById('ei2').value) || 0;
 
             // 得点計算
             const totalA = jpn + mat + sci + eng;
